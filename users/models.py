@@ -1,9 +1,9 @@
 from django.db import models
-from django.contrib.auth import models as auth_models
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 # Create your models here.
 
-class UserManager(auth_models.BaseUserManager):
-    def create_user(self, first_name:str, last_name:str, email:str,age:int, password:str = None,  is_staff = False, is_superuser = False) -> 'User':
+class UserManager(BaseUserManager):
+    def create_user(self, first_name:str, last_name:str, email:str, password:str, **other_fields) -> 'User':
         if not email:
             raise ValueError('User must have email')
         if not first_name:
@@ -11,28 +11,42 @@ class UserManager(auth_models.BaseUserManager):
         if not last_name:
             raise ValueError('User must have last_name')
         
-        user = self.model(email = self.normalize_email(email))
-        user.first_name = first_name
-        user.last_name = last_name
-        user.age = age
+        email = self.normalize_email(email)
+        user = self.model(
+            email=email,
+            first_name = first_name,
+            last_name = last_name,
+            **other_fields
+        )
         user.set_password(password)
-        user.is_active = True
-        user.is_superuser = is_superuser
-        user.is_staff = is_staff
         user.save()
-
         return user
 
     
-    def create_superuser(self, first_name:str, last_name:str, email:str, password:str) -> 'User':
+    def create_superuser(self, first_name:str, last_name:str, email:str, password:str, **other_fields) -> 'User':
+        other_fields.setdefault('is_staff', True)
+        other_fields.setdefault('is_active', True)
+        other_fields.setdefault('is_superuser', True)
+
+        if other_fields.get('is_staff') is not True:
+            raise ValueError(
+                'Superuser must be assigned to is_staff=True'
+            )
+        if other_fields.get('is_active') is not True:
+            raise ValueError(
+                'Superuser must be assigned to is_active=True'
+            )
+        if other_fields.get('is_superuser') is not True:
+            raise ValueError(
+                'Superuser must be assigned to is_superuser=True'
+            )
+
         user = self.create_user(
             first_name= first_name,
             last_name=last_name,
             email=email,
             password=password,
-            is_staff=True,
-            is_superuser=True,
-
+            **other_fields
         )
 
         return user
@@ -40,13 +54,16 @@ class UserManager(auth_models.BaseUserManager):
 
     
 
-class User(auth_models.AbstractUser):
+class User(AbstractUser):
     first_name = models.CharField(verbose_name='First Name', max_length=255)
     last_name = models.CharField(verbose_name='Last Name', max_length=255)
     email = models.EmailField(verbose_name='Email', unique=True, max_length=255)
     password = models.CharField(verbose_name='Password', max_length=255)
-    age = models.IntegerField(verbose_name='Age', default=0)
-    username = None
+    roles = models.CharField(verbose_name='Role', max_length=255, null=True, default='')
+    dob = models.DateField(verbose_name='Date Of Birth', null=True, auto_now=True)
+    username = models.CharField(unique=True, max_length=255)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     object = UserManager()
 
