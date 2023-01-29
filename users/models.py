@@ -60,7 +60,7 @@ class User(AbstractUser):
     email = models.EmailField(verbose_name='Email', unique=True, max_length=255)
     password = models.CharField(verbose_name='Password', max_length=255)
     roles = models.CharField(verbose_name='Role', max_length=255, null=True, default='')
-    dob = models.DateField(verbose_name='Date Of Birth', null=True, auto_now=True)
+    dob = models.DateField(verbose_name='Date Of Birth', null=True)
     username = models.CharField(unique=True, max_length=255)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
