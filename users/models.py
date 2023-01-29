@@ -55,11 +55,15 @@ class UserManager(BaseUserManager):
     
 
 class User(AbstractUser):
+    ROLE_CHOICES = [
+        ('Worker', 'Worker'),
+        ('Master', 'Master')
+    ]
     first_name = models.CharField(verbose_name='First Name', max_length=255)
     last_name = models.CharField(verbose_name='Last Name', max_length=255)
     email = models.EmailField(verbose_name='Email', unique=True, max_length=255)
     password = models.CharField(verbose_name='Password', max_length=255)
-    roles = models.CharField(verbose_name='Role', max_length=255, null=True, default='')
+    roles = models.CharField(verbose_name='Role', max_length=255, null=True, choices=ROLE_CHOICES   )
     dob = models.DateField(verbose_name='Date Of Birth', null=True)
     username = models.CharField(unique=True, max_length=255)
     is_staff = models.BooleanField(default=False)

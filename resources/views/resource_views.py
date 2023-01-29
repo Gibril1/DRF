@@ -4,13 +4,13 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .serializers import ResourceSerializer
-from .models import Resource
-from .permissions import MasterPermission, UserEditDeletePermission
+from ..serializers import ResourceSerializer
+from ..models import Resource
+from ..permissions import MasterPermission, UserEditDeletePermission
 
 
 # Create your views here.
-class ResourceView(APIView, MasterPermission):
+class ResourceView(APIView):
     permission_classes = [IsAuthenticated, MasterPermission]
     def get(self, request):
         resources = Resource.objects.all()

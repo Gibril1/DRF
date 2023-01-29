@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import ResourceView, ResourceDetailView
+from .views.resource_views import ResourceView, ResourceDetailView
 
 urlpatterns = [
     path('', ResourceView.as_view()),
